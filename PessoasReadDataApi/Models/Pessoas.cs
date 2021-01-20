@@ -7,7 +7,7 @@ namespace PessoasDataApi.Domain
 {
     public sealed class Pessoas
     {
-        public long ID { get; set; }
+        public int ID { get; set; }
         public string nome { get; set; }
         public string sobrenome { get; set; }
         public int idade { get; set; }

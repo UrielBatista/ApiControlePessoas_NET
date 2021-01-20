@@ -42,6 +42,25 @@ namespace PessoasDataApi.Repository
             
         }
 
+        public async Task<int> DeletarPessoasAsync(int id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var sql = PessoasScripts.DELETE_PESSOAS_DATA;
+
+                return await connection.ExecuteAsync(sql: sql, param: new { ID = id }, commandTimeout: 60);
+            }
+        }
+
+        public async Task<int> AtualizarPessoasAsync(Pessoas[] step)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var sql = PessoasScripts.UPDATE_PESSOAS_DATA;
+
+                return await connection.ExecuteAsync(sql, step, commandTimeout: 60);
+            }
+        }
     }
 }
 

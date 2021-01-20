@@ -11,5 +11,9 @@ namespace PessoasDataApi.Services
         Task<Pessoas[]> ListarPessoasAsync();
 
         Task<int> InserirPessoasAsync(Pessoas[] step);
+
+        Task<int> DeletarPessoasAsync(int id);
+
+        Task<int> AtualizarPessoasAsync(Pessoas[] step);
     }
 }

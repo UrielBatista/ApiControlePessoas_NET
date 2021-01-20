@@ -11,6 +11,9 @@ namespace PessoasDataApi.Repository
         Task<int> InserirPessoasAsync(Pessoas[] step);
 
         Task<Pessoas[]> ListarPessoasAsync();
-        
+
+        Task<int> DeletarPessoasAsync(int id);
+
+        Task<int> AtualizarPessoasAsync(Pessoas[] step);
     }
 }

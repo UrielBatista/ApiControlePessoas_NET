@@ -29,5 +29,19 @@ namespace PessoasDataApi.Services.Support
 
             return retorno;
         }
+
+        public async Task<int> DeletarPessoasAsync(int id)
+        {
+            var retorno = await _pessoasRepository.DeletarPessoasAsync(id);
+
+            return retorno;
+        }
+
+        public async Task<int> AtualizarPessoasAsync(Pessoas[] step)
+        {
+            var retorno = await _pessoasRepository.AtualizarPessoasAsync(step);
+
+            return retorno;
+        }
     }
 }

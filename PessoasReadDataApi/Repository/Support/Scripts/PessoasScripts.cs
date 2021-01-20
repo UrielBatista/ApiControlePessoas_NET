@@ -34,5 +34,16 @@ namespace PessoasDataApi.Repository.Support.Scripts
 														@telefone,
 														@email)";
 
+		internal readonly static string DELETE_PESSOAS_DATA = @"DELETE FROM PESSOAS WHERE ID_PESSOA = @ID";
+
+		internal readonly static string UPDATE_PESSOAS_DATA = @"UPDATE PESSOAS SET 
+																PRIMEIRO_NOME = @nome,
+																SEGUNDO_NOME = @sobrenome,
+																IDADE = @idade,
+																ENDERESSO = @enderesso,
+																TELEFONE = @telefone,
+																EMAIL_VALIDACAO = @email
+															WHERE ID_PESSOA = @ID";
+
 	}
 }

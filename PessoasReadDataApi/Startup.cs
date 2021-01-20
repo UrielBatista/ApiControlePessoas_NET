@@ -58,11 +58,8 @@ namespace PessoasDataApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Controle Pessoas V1");
             });
 
-            app.UseAuthentication();
-
             app.UseRouting();
-            app.UseCors("AllowOrigin");
-            app.UseAuthorization();
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {

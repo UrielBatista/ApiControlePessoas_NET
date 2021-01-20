@@ -44,13 +44,50 @@ namespace PessoasDataApi.Controller
         {
             try
             {
+
                 return Ok(await _pessoasService.InserirPessoasAsync(step));
+
             }
             catch (Exception ex)
             {
+
                 return StatusCode(400, new { message = ex.Message });
                
             }
         }
+
+        [HttpDelete("[action]/{id}")]
+        [ProducesResponseType(typeof(int), 200)]
+        public async Task<IActionResult> DeletarPessoas(int id)
+        {
+            try
+            {
+                return Ok(await _pessoasService.DeletarPessoasAsync(id));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new { message = ex.Message });
+
+            }
+        }
+        
+        [HttpPut("[action]")]
+        [ProducesResponseType(typeof(int), 200)]
+        public async Task<IActionResult> AtualizarPessoas([FromBody] Pessoas[] step)
+        {
+            try
+            {
+
+                return Ok(await _pessoasService.AtualizarPessoasAsync(step));
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(400, new { message = ex.Message });
+            }
+            
+        }
+        
     }
 }
