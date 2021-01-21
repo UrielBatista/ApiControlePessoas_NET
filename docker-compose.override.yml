@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  pessoasdataapi:
+    image: ${DOCKER_REGISTRY-}pessoasdataapi
+    build:
+      context: .
+      dockerfile: PessoasReadDataApi/Dockerfile
+    environment:
+      - APPLICATION_NAME="Pessoas Api"
+      - DATABASE_HOST=localhost
+      - DATABASE_NAME=master
+      - DATABASE_USER=sa
+      - DATABASE_PASS=123456
+      - TIMEOUT=15
+      - MAX_POOL_SIZE=250
+      - TZ=America/Sao_Paulo
+    ports:
+      - "5342:80"   

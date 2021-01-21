@@ -6,11 +6,17 @@ using Microsoft.Extensions.Hosting;
 using PessoasDataApi.Repository;
 using PessoasDataApi.Services;
 using PessoasDataApi.Services.Support;
+using System;
 
 namespace PessoasDataApi
 {
     public class Startup
     {
+        private static readonly string DATABASE_HOST = Environment.GetEnvironmentVariable("DATABASE_HOST");
+        private static readonly string DATABASE_NAME = Environment.GetEnvironmentVariable("DATABASE_NAME");
+        private static readonly string DATABASE_USER = Environment.GetEnvironmentVariable("DATABASE_USER");
+        private static readonly string DATABASE_PASS = Environment.GetEnvironmentVariable("DATABASE_PASS");
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -39,7 +45,11 @@ namespace PessoasDataApi
             });
 
             services.AddControllers();
-            
+
+            services
+                .AddHealthChecks()
+                .AddSqlServer($"Server={DATABASE_HOST};Database={DATABASE_NAME};User Id={DATABASE_USER};Password={DATABASE_PASS}", tags: new[] { "services" });
+
             services.AddScoped<IPessoasRepository, PessoasRepository>();
             services.AddScoped<IPessoasService, PessoasService>();
            
