@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PessoasDataApi.Domain;
+using PessoasDataApi.Models;
 using PessoasDataApi.Repository;
 using PessoasDataApi.Services;
 using PessoasDataApi.Services.Support;
+using RabbitMQ.Client;
 
 namespace PessoasDataApi.Controller
 {
@@ -16,12 +20,43 @@ namespace PessoasDataApi.Controller
     public class PessoasController : ControllerBase
     {
         private readonly IPessoasService _pessoasService;
-
-        public PessoasController(IPessoasService pessoasService)
+        private readonly IMessageService _messageService;
+        
+        public PessoasController(IPessoasService pessoasService, IMessageService messageService)
         {
             _pessoasService = pessoasService;
+            _messageService = messageService;
         }
 
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public async Task<ActionResult<dynamic>> Autenticacao([FromBody] User model)
+        {
+            //var user = UserRepository.Get(model.Username, model.Password);
+            var user = CredencialUsuario.Get(model.Username, model.Password);
+
+            if (user == null || user.Password == null)
+                return NotFound(new { message = "Usuário ou senha inválidos" });
+
+            var token = TokenService.GenerateToken(user);
+            user.Password = "";
+            return new
+            {
+                user = user,
+                token = token
+            };
+            
+        }
+
+        [HttpGet]
+        [Route("Login")]
+        [Authorize]
+        public string Login() => string.Format("Usuario tem acesso a página");
+
+
+        /// <summary>
+        /// Traser todas as pessoas da base.
+        /// </summary>
         [HttpGet("[action]")]
         [ProducesResponseType(typeof(Pessoas[]), 200)]
         public async Task<IActionResult> ListarPessoas()
@@ -37,7 +72,28 @@ namespace PessoasDataApi.Controller
                
             }
         }
+        /// <summary>
+        /// Traser pessoas de germany.
+        /// </summary>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(PessoasGermany[]), 200)]
+        public async Task<IActionResult> ListarPessoasGermany()
+        {
+            try
+            {
+                return Ok(await _pessoasService.ListarPessoasGermanyAsync());
 
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new { message = ex.Message });
+
+            }
+        }
+        
+        /// <summary>
+        /// Inserir dados de pessoas na base.
+        /// </summary>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(int), 200)]
         public async Task<IActionResult> InserirPessoas([FromBody]Pessoas[] step)
@@ -55,7 +111,31 @@ namespace PessoasDataApi.Controller
                
             }
         }
+        /// <summary>
+        /// Inserir dados de pessoas na base germany.
+        /// </summary>
+        [HttpPost("[action]")]
+        [ProducesResponseType(typeof(int), 200)]
+        public async Task<IActionResult> InserirPessoasGermany([FromBody]PessoasGermany data)
+        {
+            try
+            {
+                //So funciona se estiver em IIS
+                Console.WriteLine("Entrando no LogData!!");
+                _messageService.Enqueue(data);
 
+                return Ok(await _pessoasService.InserirPessoasGermanyAsync(data));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new { message = ex.Message });
+
+            }
+        }
+
+        /// <summary>
+        /// Deletar dados pessoas.
+        /// </summary>
         [HttpDelete("[action]/{id}")]
         [ProducesResponseType(typeof(int), 200)]
         public async Task<IActionResult> DeletarPessoas(int id)
@@ -71,7 +151,27 @@ namespace PessoasDataApi.Controller
 
             }
         }
-        
+
+        /// <summary>
+        /// Deletar dados pessoas germany.
+        /// </summary>
+        [HttpDelete("[action]/{id}")]
+        [ProducesResponseType(typeof(int), 200)]
+        public async Task<IActionResult> DeletarPessoasGermany(string id)
+        {
+            try
+            {
+                return Ok(await _pessoasService.DeletarPessoasGermanyAsync(id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Atulizar dados pessoas da base.
+        /// </summary>
         [HttpPut("[action]")]
         [ProducesResponseType(typeof(int), 200)]
         public async Task<IActionResult> AtualizarPessoas([FromBody] Pessoas[] step)

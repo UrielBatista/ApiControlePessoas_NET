@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
-using PessoasDataApi.Domain;
+using PessoasDataApi.Models;
 using PessoasDataApi.Repository.Support.Scripts;
 
 namespace PessoasDataApi.Repository
@@ -26,6 +24,18 @@ namespace PessoasDataApi.Repository
                 var sql = PessoasScripts.SELECT_PESSOAS_DATA;
 
                 var retorno = await connection.QueryAsync<Pessoas>(sql, commandTimeout: 60).ConfigureAwait(false);
+
+                return retorno.ToArray();
+            }
+        }
+
+        public async Task<PessoasGermany[]> ListarPessoasGermanyAsync()
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var sql = PessoasScripts.SELECT_GERMANY_PESSOAS;   
+
+                var retorno = await connection.QueryAsync<PessoasGermany>(sql, commandTimeout: 60).ConfigureAwait(false);
 
                 return retorno.ToArray();
             }
@@ -52,6 +62,18 @@ namespace PessoasDataApi.Repository
             }
         }
 
+        public async Task<int> DeletarPessoasGermanyAsync(string id)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var sql = PessoasScripts.DELETE_GERMANY_PESSOAS;
+
+                var param = new { iban = id };
+
+                return await connection.ExecuteAsync(sql, param, commandTimeout: 60);
+            }
+        }
+
         public async Task<int> AtualizarPessoasAsync(Pessoas[] step)
         {
             using (var connection = new SqlConnection(_connectionString))
@@ -61,6 +83,17 @@ namespace PessoasDataApi.Repository
                 return await connection.ExecuteAsync(sql, step, commandTimeout: 60);
             }
         }
+
+        public async Task<int> InserirPessoasGermanyAsync(PessoasGermany data)
+        {
+            using (var conncetion = new SqlConnection(_connectionString))
+            {
+                var sql = PessoasScripts.INSERT_GERMANY_PESSOAS;
+
+                return await conncetion.ExecuteAsync(sql, data, commandTimeout: 60);
+            }
+        }
+
     }
 }
 

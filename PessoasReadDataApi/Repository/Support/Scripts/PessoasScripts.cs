@@ -45,5 +45,35 @@ namespace PessoasDataApi.Repository.Support.Scripts
 																EMAIL_VALIDACAO = @email
 															WHERE ID_PESSOA = @ID";
 
+		internal readonly static string SELECT_GERMANY_PESSOAS = @"SELECT  
+																	NOME_PESSOA nomes,
+																	ADDRESS_PESSOA enderessos,
+																	CITY cidade,
+																	POSTCODE codigoPostal,
+																	IBAN_NUMERO iban
+																FROM IBAN_PESSOAS";
+
+		internal readonly static string INSERT_GERMANY_PESSOAS = @"INSERT INTO IBAN_PESSOAS (
+																	NOME_PESSOA, 
+																	ADDRESS_PESSOA, 
+																	CITY, 
+																	POSTCODE, 
+																	IBAN_NUMERO) 
+																VALUES (
+																	@nomes, 
+																	@enderessos,
+																	@cidade, 
+																	@codigoPostal, 
+																	@iban)";
+
+		internal readonly static string DELETE_GERMANY_PESSOAS = @"DELETE FROM IBAN_PESSOAS WHERE IBAN_NUMERO = @iban";
+
+		internal readonly static string SELECT_USUARIO_CADASTRADO = @"SELECT 
+																		ID Id,
+																		NOME Username,
+																		SENHA Password,
+																		PRIVILEGIO Role
+																	FROM USUARIOS_CADASTRADOS WHERE NOME = @Username and SENHA = @Password";
+
 	}
 }

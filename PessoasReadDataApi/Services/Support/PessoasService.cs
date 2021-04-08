@@ -1,4 +1,4 @@
-﻿using PessoasDataApi.Domain;
+﻿using PessoasDataApi.Models;
 using PessoasDataApi.Repository;
 using System;
 using System.Collections.Generic;
@@ -37,9 +37,30 @@ namespace PessoasDataApi.Services.Support
             return retorno;
         }
 
+        public async Task<int> DeletarPessoasGermanyAsync(string id)
+        {
+            var retorno = await _pessoasRepository.DeletarPessoasGermanyAsync(id);
+
+            return retorno;
+        }
+
         public async Task<int> AtualizarPessoasAsync(Pessoas[] step)
         {
             var retorno = await _pessoasRepository.AtualizarPessoasAsync(step);
+
+            return retorno;
+        }
+
+        public async Task<PessoasGermany[]> ListarPessoasGermanyAsync()
+        {
+            var retorno = await _pessoasRepository.ListarPessoasGermanyAsync();
+
+            return retorno;
+        }
+
+        public async Task<int> InserirPessoasGermanyAsync(PessoasGermany data)
+        {
+            var retorno = await _pessoasRepository.InserirPessoasGermanyAsync(data);
 
             return retorno;
         }

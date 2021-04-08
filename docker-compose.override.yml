@@ -1,6 +1,15 @@
 version: '3.4'
 
 services:
+  rabbitmq: # login guest:guest
+    image: rabbitmq:3-management
+    hostname: "rabbitmq"
+    labels:
+      NAME: "rabbitmq"
+    ports:
+    - "15672:15672"
+    - "5672:5672"
+
   pessoasdataapi:
     image: ${DOCKER_REGISTRY-}pessoasdataapi
     build:
@@ -16,4 +25,6 @@ services:
       - MAX_POOL_SIZE=250
       - TZ=America/Sao_Paulo
     ports:
-      - "5342:80"   
+      - "5342:80"
+
+  
