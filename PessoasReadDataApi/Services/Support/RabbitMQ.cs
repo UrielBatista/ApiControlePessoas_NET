@@ -13,7 +13,7 @@ namespace PessoasDataApi.Services.Support
     // define interface and service
     public interface IMessageService
     {
-        string Enqueue(PessoasGermany data);
+        string Enqueue(Bot data);
     }
 
     public class LogData : IMessageService
@@ -23,20 +23,26 @@ namespace PessoasDataApi.Services.Support
         IModel _channel;
         public LogData()
         {
-            Console.WriteLine("Abrindo conexao com RabbitMQ");
-
-            _factory = new ConnectionFactory() { HostName = "rabbitmq", Port = 5672 };
-            _factory.UserName = "guest";
-            _factory.Password = "guest";
-            _conn = _factory.CreateConnection();
-            _channel = _conn.CreateModel();
-            _channel.QueueDeclare(queue: "hello",
-                                    durable: false,
-                                    exclusive: false,
-                                    autoDelete: false,
-                                    arguments: null);
+            //Open connection RabbitMQ
+            try
+            {
+                _factory = new ConnectionFactory() { HostName = "rabbitmq", Port = 5672 };
+                _factory.UserName = "guest";
+                _factory.Password = "guest";
+                _conn = _factory.CreateConnection();
+                _channel = _conn.CreateModel();
+                _channel.QueueDeclare(queue: "hello",
+                                        durable: false,
+                                        exclusive: false,
+                                        autoDelete: false,
+                                        arguments: null);
+            } catch
+            {
+                Console.WriteLine("Pass Message user not logged!!");
+            }
+            
         }
-        public string Enqueue(PessoasGermany data)
+        public string Enqueue(Bot data)
         {
             string message = JsonSerializer.Serialize(data);
             var body = Encoding.UTF8.GetBytes(message);

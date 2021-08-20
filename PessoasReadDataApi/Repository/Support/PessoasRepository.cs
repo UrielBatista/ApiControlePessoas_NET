@@ -84,16 +84,32 @@ namespace PessoasDataApi.Repository
             }
         }
 
-        public async Task<int> InserirPessoasGermanyAsync(PessoasGermany data)
+        public async Task<string> ExecutorBot(Bot data)
         {
             using (var conncetion = new SqlConnection(_connectionString))
             {
-                var sql = PessoasScripts.INSERT_GERMANY_PESSOAS;
+                var retorno = data.num;
 
-                return await conncetion.ExecuteAsync(sql, data, commandTimeout: 60);
+                return retorno;
             }
         }
 
+        public async Task<string> RetornoBotExecutorAsync(ReceiveBot data)
+        {
+            var retorno = data.Receive;
+
+            return retorno;
+        }
+
+        public async Task<string> ListaRetornoBotsAsync()
+        {
+
+            ReceiveBot model = new ReceiveBot();
+
+            var data = model.Receive;
+
+            return data;
+        }
     }
 }
 

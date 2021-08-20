@@ -15,7 +15,11 @@ namespace PessoasDataApi.Services
 
         Task<int> InserirPessoasAsync(Pessoas[] step);
 
-        Task<int> InserirPessoasGermanyAsync(PessoasGermany data);
+        Task<string> ExecutorBot(Bot data);
+
+        Task<string> ListaRetornoBotsAsync();
+
+        Task<string> RetornoBotExecutorAsync(ReceiveBot data);
 
         Task<int> DeletarPessoasAsync(int id);
 

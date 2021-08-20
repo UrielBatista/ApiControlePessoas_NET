@@ -10,7 +10,9 @@ using PessoasDataApi.Models;
 using PessoasDataApi.Repository;
 using PessoasDataApi.Services;
 using PessoasDataApi.Services.Support;
+using Microsoft.AspNetCore.SignalR;
 using RabbitMQ.Client;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PessoasDataApi.Controller
 {
@@ -21,38 +23,25 @@ namespace PessoasDataApi.Controller
     {
         private readonly IPessoasService _pessoasService;
         private readonly IMessageService _messageService;
-        
-        public PessoasController(IPessoasService pessoasService, IMessageService messageService)
+        private readonly IReturnStatusRepository _returnStatusRepository;
+        private readonly IReturnStatusProvider _returnStatusProvider;
+
+
+        public PessoasController(IPessoasService pessoasService, 
+            IMessageService messageService, 
+            IReturnStatusRepository returnStatusRepository, 
+            IReturnStatusProvider returnStatusProvider)
         {
             _pessoasService = pessoasService;
             _messageService = messageService;
-        }
-
-        [HttpPost("[action]")]
-        [AllowAnonymous]
-        public async Task<ActionResult<dynamic>> Autenticacao([FromBody] User model)
-        {
-            //var user = UserRepository.Get(model.Username, model.Password);
-            var user = CredencialUsuario.Get(model.Username, model.Password);
-
-            if (user == null || user.Password == null)
-                return NotFound(new { message = "Usuário ou senha inválidos" });
-
-            var token = TokenService.GenerateToken(user);
-            user.Password = "";
-            return new
-            {
-                user = user,
-                token = token
-            };
-            
+            _returnStatusRepository = returnStatusRepository;
+            _returnStatusProvider = returnStatusProvider;
         }
 
         [HttpGet]
         [Route("Login")]
         [Authorize]
         public string Login() => string.Format("Usuario tem acesso a página");
-
 
         /// <summary>
         /// Traser todas as pessoas da base.
@@ -72,6 +61,26 @@ namespace PessoasDataApi.Controller
                
             }
         }
+
+        /// <summary>
+        /// Mostrar status dos bots em andamento.
+        /// </summary>
+        [HttpGet("[action]")]
+        [ProducesResponseType(typeof(Cliente[]), 200)]
+        public async Task<IActionResult> ListaRetornoBots()
+        {
+            try
+            {
+                return Ok(await _returnStatusProvider.Get());
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new { message = ex.Message });
+
+            }
+        }
+
         /// <summary>
         /// Traser pessoas de germany.
         /// </summary>
@@ -116,21 +125,52 @@ namespace PessoasDataApi.Controller
         /// </summary>
         [HttpPost("[action]")]
         [ProducesResponseType(typeof(int), 200)]
-        public async Task<IActionResult> InserirPessoasGermany([FromBody]PessoasGermany data)
+        public async Task<IActionResult> ExecutorBot([FromBody] Bot data)
         {
             try
             {
                 //So funciona se estiver em IIS
                 Console.WriteLine("Entrando no LogData!!");
-                _messageService.Enqueue(data);
-
-                return Ok(await _pessoasService.InserirPessoasGermanyAsync(data));
+                
+                return Ok(_messageService.Enqueue(data));
             }
             catch (Exception ex)
             {
                 return StatusCode(400, new { message = ex.Message });
 
             }
+        }
+
+        /// <summary>
+        /// Post de saida do bot.
+        /// </summary>
+        [HttpPost("[action]")]
+        public async Task RetornoBotExecutor(Cliente product)
+        {
+            //_chatHub.SendMesssage(product.Description);
+            await _returnStatusRepository.Create(product);
+        
+        }
+        
+
+        [HttpPost("[action]")]
+        [AllowAnonymous]
+        public async Task<ActionResult<dynamic>> Autenticacao([FromBody] User model)
+        {
+            //var user = UserRepository.Get(model.Username, model.Password);
+            var user = CredencialUsuario.Get(model.Username, model.Password);
+
+            if (user == null || user.Password == null)
+                return NotFound(new { message = "Usuário ou senha inválidos" });
+
+            var token = TokenService.GenerateToken(user);
+            user.Password = "";
+            return new
+            {
+                user = user,
+                token = token
+            };
+
         }
 
         /// <summary>
@@ -150,6 +190,12 @@ namespace PessoasDataApi.Controller
                 return StatusCode(400, new { message = ex.Message });
 
             }
+        }
+
+        [HttpDelete("[action]")]
+        public async Task LimparExecucaoDeBots()
+        {
+            await _returnStatusRepository.Delete();
         }
 
         /// <summary>

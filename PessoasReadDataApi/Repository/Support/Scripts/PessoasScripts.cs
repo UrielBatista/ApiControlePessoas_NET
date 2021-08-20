@@ -75,5 +75,6 @@ namespace PessoasDataApi.Repository.Support.Scripts
 																		PRIVILEGIO Role
 																	FROM USUARIOS_CADASTRADOS WHERE NOME = @Username and SENHA = @Password";
 
+		internal readonly static string SELECT_DB_BOTS = @"SELECT * FROM DataStatus";
 	}
 }

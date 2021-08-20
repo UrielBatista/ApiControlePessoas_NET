@@ -58,9 +58,22 @@ namespace PessoasDataApi.Services.Support
             return retorno;
         }
 
-        public async Task<int> InserirPessoasGermanyAsync(PessoasGermany data)
+        public async Task<string> ExecutorBot(Bot data)
         {
-            var retorno = await _pessoasRepository.InserirPessoasGermanyAsync(data);
+            var retorno = await _pessoasRepository.ExecutorBot(data);
+
+            return retorno;
+        }
+        public async Task<string> RetornoBotExecutorAsync(ReceiveBot data)
+        {
+            var retorno = await _pessoasRepository.RetornoBotExecutorAsync(data);
+
+            return retorno;
+        }
+
+        public async Task<string> ListaRetornoBotsAsync()
+        {
+            var retorno = await _pessoasRepository.ListaRetornoBotsAsync();
 
             return retorno;
         }
