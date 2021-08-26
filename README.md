@@ -40,7 +40,7 @@ O projeto foi feito em .net Core e as principais bibliotecas utilizadas em seu d
 O diagrama de estados foi desenvolvido em UML para facilitar o entendimento do processo de execução dos 
 bots pelo frontend.
 
-![Diagrama](Imagens\diagrama.png)
+![Diagrama](https://github.com/UrielBatista/ApiControlePessoas_NET/blob/main/Imagens/diagrama.png)
 
 
 
