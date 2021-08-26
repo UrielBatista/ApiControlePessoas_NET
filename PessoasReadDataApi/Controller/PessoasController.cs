@@ -23,19 +23,15 @@ namespace PessoasDataApi.Controller
     {
         private readonly IPessoasService _pessoasService;
         private readonly IMessageService _messageService;
-        private readonly IReturnStatusRepository _returnStatusRepository;
-        private readonly IReturnStatusProvider _returnStatusProvider;
 
 
         public PessoasController(IPessoasService pessoasService, 
-            IMessageService messageService, 
-            IReturnStatusRepository returnStatusRepository, 
-            IReturnStatusProvider returnStatusProvider)
+            IMessageService messageService)
+           
         {
             _pessoasService = pessoasService;
             _messageService = messageService;
-            _returnStatusRepository = returnStatusRepository;
-            _returnStatusProvider = returnStatusProvider;
+            
         }
 
         [HttpGet]
@@ -62,24 +58,6 @@ namespace PessoasDataApi.Controller
             }
         }
 
-        /// <summary>
-        /// Mostrar status dos bots em andamento.
-        /// </summary>
-        [HttpGet("[action]")]
-        [ProducesResponseType(typeof(Cliente[]), 200)]
-        public async Task<IActionResult> ListaRetornoBots()
-        {
-            try
-            {
-                return Ok(await _returnStatusProvider.Get());
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, new { message = ex.Message });
-
-            }
-        }
 
         /// <summary>
         /// Traser pessoas de germany.
@@ -141,16 +119,6 @@ namespace PessoasDataApi.Controller
             }
         }
 
-        /// <summary>
-        /// Post de saida do bot.
-        /// </summary>
-        [HttpPost("[action]")]
-        public async Task RetornoBotExecutor(Cliente product)
-        {
-            //_chatHub.SendMesssage(product.Description);
-            await _returnStatusRepository.Create(product);
-        
-        }
         
 
         [HttpPost("[action]")]
@@ -190,12 +158,6 @@ namespace PessoasDataApi.Controller
                 return StatusCode(400, new { message = ex.Message });
 
             }
-        }
-
-        [HttpDelete("[action]")]
-        public async Task LimparExecucaoDeBots()
-        {
-            await _returnStatusRepository.Delete();
         }
 
         /// <summary>

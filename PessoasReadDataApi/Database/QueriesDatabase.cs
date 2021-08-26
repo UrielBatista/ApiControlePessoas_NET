@@ -23,7 +23,7 @@ namespace SqliteDapper.Demo.Database
             if (!string.IsNullOrEmpty(tableName) && tableName == "clientes")
                 return;
 
-            
+
             connection.Execute("Create Table clientes (" +
                 "id integer PRIMARY KEY," +
                 "nome text," +

@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace PessoasDataApi.Models
 {
-    public class PostReturn
+    public class DeleteBotRetornoInput
     {
-        public int Id { get; set; }
-        public int Status { get; set; }
+        public int RetornoId { get; set; }
     }
 }

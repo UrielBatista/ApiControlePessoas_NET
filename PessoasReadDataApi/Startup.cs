@@ -1,23 +1,19 @@
-using GraphiQl;
-using GraphQL;
-using GraphQueryLanguage.Demo.Demo;
+using HotChocolate;
+using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Playground;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using PessoasDataApi.Database;
-using PessoasDataApi.Queries;
+using PessoasDataApi.GraphQL;
 using PessoasDataApi.Repository;
 using PessoasDataApi.Repository.Support;
 using PessoasDataApi.Services;
 using PessoasDataApi.Services.Support;
-using PessoasDataApi.Types;
 using SqliteDapper.Demo.Database;
 using System;
 using System.IO;
@@ -42,7 +38,7 @@ namespace PessoasDataApi
             Configuration = configuration;
         }
 
-
+        [Obsolete]
         public void ConfigureServices(IServiceCollection services)
         {
 
@@ -56,9 +52,6 @@ namespace PessoasDataApi
                 });
             });
 
-            services.AddDbContext<Contexto>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("sqllitedb"))
-            );
 
             services.AddSwaggerGen(c =>
 
@@ -70,7 +63,7 @@ namespace PessoasDataApi
                 });
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                var xmlPath = System.IO.Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
 
             });
@@ -109,51 +102,61 @@ namespace PessoasDataApi
 
             services.AddSingleton(new DatabaseConfig { Name = Configuration["DatabaseName"] });
             services.AddScoped<IQueriesDatabase, QueriesDatabase>();
-            services.AddScoped<IReturnStatusProvider, ReturnStatusProvider>();
-            services.AddScoped<IReturnStatusRepository, ReturnStatusRepository>();
 
-            services.AddTransient<IClienteRepository, ClientRepository>();
+            services.AddSingleton<IGroupService, GroupService>();
+            services.AddSingleton<IBotRetornoService, BotRetornoService>();
 
-            services.
-                AddMvc(option => option.EnableEndpointRouting = false)
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-
-
-            services.AddSingleton<IDependencyResolver>(
-                c => new FuncDependencyResolver(type => c.GetRequiredService(type)));
-            services.AddScoped<ClienteScheme>();
-            services.AddScoped<ClientQuery>();
-            services.AddScoped<ClienteType>();
-            services.AddScoped<PostReturnType>();
-            //services.AddScoped<ClienteMutation>();
+            
+            //services.AddGraphQL(x => SchemaBuilder.New()
+            //    .AddServices(x)
+            //    .AddType<GroupType>()
+            //    .AddType<StudentType>()
+            //    .AddQueryType<Query>()
+            //    .AddMutationType<Mutation>()
+            //    .Create()
+            //);
+            services.AddGraphQLServer()
+                .AddInMemorySubscriptions()
+                .AddType<GroupType>()
+                .AddType<BotsRetornoType>()
+                .AddSubscriptionType<SubscriptionObjectType>()
+                .AddMutationType<Mutation>()
+                .AddQueryType<Query>();
 
         }
 
+
+        [Obsolete]
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UsePlayground(new PlaygroundOptions
+                {
+                    QueryPath = "/api",
+                    Path = "/Playground"
 
+                });
             }
 
+            app.UseGraphQL("/api");
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Controle Pessoas V1");
             });
-
+            
+            app.UseWebSockets();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors();
-
-            app.UseGraphiQl();
+            app.UseCors("AllowOrigin");
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGraphQL();
             });
 
 

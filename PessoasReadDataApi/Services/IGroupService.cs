@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PessoasDataApi.Repository
+namespace PessoasDataApi.Services
 {
-    public interface IReturnStatusProvider
+    public interface IGroupService
     {
-        Task<IEnumerable<Cliente>> Get();
+        IQueryable<Group> GetAll();
     }
 }
